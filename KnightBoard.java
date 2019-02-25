@@ -5,19 +5,16 @@ public class KnightBoard {
             { -2, 1 }, { -1, 2 } };
 
     public static void main(String[] args) {
-        KnightBoard kb = new KnightBoard(5,5);
+        KnightBoard kb = new KnightBoard(30, 30);
         System.out.println("Start");
         long start = System.nanoTime();
-        //sum for 5x5 = 1728
-        /*int sum = 0;
-        for(int i = 0; i < 5; i++){
-            for (int j = 0; j < 5; j++){
-                sum += kb.countSolutions(i, j);
-            }
-        }
-        System.out.println(sum);*/
+        /*
+         * sum for 5x5 = 1728 int sum = 0; for(int i = 0; i < 5; i++){ for (int j = 0; j
+         * < 5; j++){ sum += kb.countSolutions(i, j); } } System.out.println(sum);
+         */
+
         System.out.println(kb.solve(0, 0));
-        System.out.println((System.nanoTime() - start)/100000 + " ms - done");
+        System.out.println((System.nanoTime() - start) / 100000 + " ms - done");
         System.out.print(kb.toString());
     }
 
@@ -25,11 +22,12 @@ public class KnightBoard {
     public int[][] possible;
     private int m;
     private int n;
+
     /**
      * @throws IllegalArgumentException when either parameter is <= 0.
-    **/
+     **/
     public KnightBoard(int m, int n) {
-        if(m <= 0 || n <= 0){
+        if (m <= 0 || n <= 0) {
             throw new java.lang.IllegalArgumentException();
         }
         moves = new int[n][m];
@@ -66,26 +64,31 @@ public class KnightBoard {
             }
         }
     }
+
     /**
-     * Modifies the board by labeling the moves from 1 (at startingRow,startingCol) up to the area of the board in proper knight move steps.
-     * @throws IllegalStateException when the board contains non-zero values.
-     * @throws IllegalArgumentException when either parameter is negative or out of bounds.
+     * Modifies the board by labeling the moves from 1 (at startingRow,startingCol)
+     * up to the area of the board in proper knight move steps.
+     * 
+     * @throws IllegalStateException    when the board contains non-zero values.
+     * @throws IllegalArgumentException when either parameter is negative or out of
+     *                                  bounds.
      * @return true when the board is solvable from the specified starting position
      */
     public boolean solve(int startRow, int startCol) {
-        if(startRow <0 || startRow > m || startCol < 0 || startCol > n){
+        if (startRow < 0 || startRow > m || startCol < 0 || startCol > n) {
             throw new IllegalArgumentException();
         }
-        for(int i = 0; i < m; i++){
-            for (int j = 0; j < n; j++){
-                if(moves[i][j]!=0){
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (moves[i][j] != 0) {
                     throw new java.lang.IllegalStateException();
                 }
             }
         }
         return solveHelper(startCol, startRow, 1);
     }
-    //Recursive helper for solve()
+
+    // Recursive helper for solve()
     private boolean solveHelper(int x, int y, int curJump) {
         moves[y][x] = curJump;
         if (curJump < m * n) {
@@ -94,7 +97,7 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if (canMove(nextX, nextY,true)) {
+                if (canMove(nextX, nextY, true)) {
                     possible[nextY][nextX] -= 1;
                     int val = possible[nextY][nextX];
                     if (sortedValues.size() == 0) {
@@ -123,7 +126,7 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if(canMove(nextX,nextY,false))
+                if (canMove(nextX, nextY, false))
                     possible[nextY][nextX] += 1;
             }
             moves[y][x] = 0;
@@ -131,25 +134,28 @@ public class KnightBoard {
         }
         return true;
     }
+
     /**
-     * @throws IllegalStateException when the board contains non-zero values. 
-     * @throws IllegalArgumentException when either parameter is negative or out of bounds.
+     * @throws IllegalStateException    when the board contains non-zero values.
+     * @throws IllegalArgumentException when either parameter is negative or out of
+     *                                  bounds.
      * @return the number of solutions from the starting position specified
      */
     public int countSolutions(int startRow, int startCol) {
-        if(startRow <0 || startRow > m || startCol < 0 || startCol > n){
+        if (startRow < 0 || startRow > m || startCol < 0 || startCol > n) {
             throw new IllegalArgumentException();
         }
-        for(int i = 0; i < m; i++){
-            for (int j = 0; j < n; j++){
-                if(moves[i][j]!=0){
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (moves[j][i] != 0) {
                     throw new java.lang.IllegalStateException();
                 }
             }
         }
         return countHelper(startCol, startRow, 1);
     }
-    //Recursive helper for countSolutions()
+
+    // Recursive helper for countSolutions()
     private int countHelper(int x, int y, int curJump) {
         moves[y][x] = curJump;
         if (curJump < m * n) {
@@ -157,7 +163,7 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if (canMove(nextX, nextY,true))
+                if (canMove(nextX, nextY, true))
                     sum += countHelper(nextX, nextY, curJump + 1);
             }
             moves[y][x] = 0;
@@ -166,8 +172,9 @@ public class KnightBoard {
         moves[y][x] = 0;
         return 1;
     }
-    //Determines whether a board square is available.
-    private boolean canMove(int x, int y,boolean checkBefore) {
+
+    // Determines whether a board square is available.
+    private boolean canMove(int x, int y, boolean checkBefore) {
         if (x >= 0 && x < m && y >= 0 && y < n) {
             if (moves[y][x] == 0 || !checkBefore) {
                 return true;
@@ -176,10 +183,10 @@ public class KnightBoard {
         return false;
     }
 
-    //Returns the board.
+    // Returns the board.
     public String toString() {
         String board = "";
-        int spacer = ((m*n) + "").length() + 1;
+        int spacer = ((m * n) + "").length() + 1;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 int x = moves[i][j];
