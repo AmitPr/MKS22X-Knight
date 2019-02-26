@@ -5,17 +5,14 @@ public class KnightBoard {
             { -2, 1 }, { -1, 2 } };
 
     public static void main(String[] args) {
-        KnightBoard kb = new KnightBoard(30, 30);
-        System.out.println("Start");
-        long start = System.nanoTime();
-        /*
-         * sum for 5x5 = 1728 int sum = 0; for(int i = 0; i < 5; i++){ for (int j = 0; j
-         * < 5; j++){ sum += kb.countSolutions(i, j); } } System.out.println(sum);
-         */
-
-        System.out.println(kb.solve(0, 0));
-        System.out.println((System.nanoTime() - start) / 100000 + " ms - done");
-        System.out.print(kb.toString());
+        for (int i = 64; i < 100; i++) {
+            KnightBoard kb = new KnightBoard(i, i);
+            System.out.println("Start - " + i + "x" + i);
+            long start = System.nanoTime();
+            System.out.println(kb.solve(0, 0));
+            System.out.println((System.nanoTime() - start) / 100000 + " ms - done");
+        }
+        //
     }
 
     public int[][] moves;
@@ -80,7 +77,7 @@ public class KnightBoard {
         }
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (moves[i][j] != 0) {
+                if (moves[j][i] != 0) {
                     throw new java.lang.IllegalStateException();
                 }
             }
@@ -97,20 +94,22 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if (canMove(nextX, nextY, true)) {
-                    possible[nextY][nextX] -= 1;
-                    int val = possible[nextY][nextX];
-                    if (sortedValues.size() == 0) {
-                        sortedValues.add(0, val);
-                        sortedIndexes.add(0, i);
-                    } else {
-                        for (int curIndex = 0; curIndex < sortedValues.size(); curIndex++) {
-                            if (val < sortedValues.get(curIndex)) {
-                                sortedValues.add(curIndex, val);
-                                sortedIndexes.add(curIndex, i);
-                                break;
+                if (nextX >= 0 && nextX < m && nextY >= 0 && nextY < n) {
+                    if (moves[nextY][nextX] == 0) {
+                        possible[nextY][nextX] -= 1;
+                        int val = possible[nextY][nextX];
+                        if (sortedIndexes.size() == 0) {
+                            sortedValues.add(0, val);
+                            sortedIndexes.add(0, i);
+                        } else {
+                            for (int curIndex = 0; curIndex < sortedValues.size(); curIndex++) {
+                                if (val < sortedValues.get(curIndex)) {
+                                    sortedValues.add(curIndex, val);
+                                    sortedIndexes.add(curIndex, i);
+                                    break;
+                                }
+                                curIndex++;
                             }
-                            curIndex++;
                         }
                     }
                 }
@@ -126,8 +125,9 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if (canMove(nextX, nextY, false))
+                if (nextX >= 0 && nextX < m && nextY >= 0 && nextY < n) {
                     possible[nextY][nextX] += 1;
+                }
             }
             moves[y][x] = 0;
             return false;
@@ -163,8 +163,11 @@ public class KnightBoard {
             for (int i = 0; i < 8; i++) {
                 int nextX = offsets[i][0] + x;
                 int nextY = offsets[i][1] + y;
-                if (canMove(nextX, nextY, true))
+                if (nextX >= 0 && nextX < m && nextY >= 0 && nextY < n) {
+                    if (moves[nextY][nextX] == 0) {
                     sum += countHelper(nextX, nextY, curJump + 1);
+                    }
+                }
             }
             moves[y][x] = 0;
             return sum;
@@ -174,14 +177,15 @@ public class KnightBoard {
     }
 
     // Determines whether a board square is available.
-    private boolean canMove(int x, int y, boolean checkBefore) {
+    /*
+    private boolean canMove(int x, int y) {
         if (x >= 0 && x < m && y >= 0 && y < n) {
-            if (moves[y][x] == 0 || !checkBefore) {
+            if (moves[y][x] == 0) {
                 return true;
             }
         }
         return false;
-    }
+    }*/
 
     // Returns the board.
     public String toString() {
